@@ -3,7 +3,9 @@ from Sensor.entity.artifact_entity import DataIngestionArtifact
 from Sensor.exception import SensorException
 from Sensor.component.data_ingestion import DataIngestion
 import sys,os
+from Sensor.component.data_ingestion import DataIngestion
 from Sensor.logger import logging
+
 class TrainPipline:
 
     def __init__(self):
@@ -15,7 +17,6 @@ class TrainPipline:
                 logging.info("starting data ingestion")
                 data_ingestion=DataIngestion(data_ingestion_config=self.data_ingestin_config)
                 data_ingestion_artifact=data_ingestion.initiate_data_ingestion()
-
                 logging.info("data ingestion completed")
                 return data_ingestion_artifact
             except Exception as e:
@@ -23,7 +24,8 @@ class TrainPipline:
 
     def start_data_validation(self):
             try:
-                pass
+                pass 
+               
             except Exception as e:
                 raise  SensorException(e,sys)
 
