@@ -8,7 +8,7 @@ class MongoDBClient:
     def __init__(self,database_name=DATABASE_NAME) -> None:
         try:
             if MongoDBClient.client is None:
-                mongo_db_url="mongodb+srv://prikshit:nature321@cluster0.nlos6in.mongodb.net/?retryWrites=true&w=majority"
+                mongo_db_url="mongodb+srv://xxxxcluster0.nlos6in.mongodb.net/?retryWrites=true&w=majority"
                 MongoDBClient.client = pymongo.MongoClient(mongo_db_url,tlsCaFile=ca)
             self.client=MongoDBClient.client
             self.database=self.client[database_name]
