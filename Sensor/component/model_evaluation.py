@@ -10,7 +10,7 @@ from scipy.stats import ks_2samp
 from Sensor.ml.model.estimator import SensorModel
 from Sensor.ml.metric.classification_metric import get_classification_score
 from Sensor.utils.main_utils import load_object,save_object
-from Sensor.ml.model.estimator import modelResolver
+from Sensor.ml.model.estimator import modelResolver,TargetValueMapping
 from Sensor.constant.Training_pipeline import TARGET_COLUMN
 
 class ModelEvaluation:
@@ -49,6 +49,7 @@ class ModelEvaluation:
             model_file_path=self.model_trainer_artifact.trained_model_file_path
             model=load_object(file_path=model_file_path)
             y_true=df[TARGET_COLUMN]
+            y_true.replace(TargetValueMapping().to_dict)
             y_train_pred=model.predict(df)
             y_latest_pred=latest_model.predict(df)
 
@@ -67,10 +68,12 @@ class ModelEvaluation:
                     trained_model_path=model_file_path,
                     trained_model_metric_artifact=trained_metric,
                     best_model_metric_artifact=latest_metric)
-                    
+            model_eval_report=model_evaluation_artifact.__dict__()
+            write_yaml_file(self.model_eval_config.report_file_path,model_eval_report)
+            logging.info(f"Model evaluataion artifact:{model_evaluation_artifact}")        
             return model_evaluation_artifact
 
-
+           
 
         except Exception as e:
             raise SensorException(e,sys)
