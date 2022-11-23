@@ -21,6 +21,7 @@ from Sensor.ml.model.estimator import modelResolver
 from uvicorn import run as app_run,app 
 from Sensor.utils.main_utils import load_object
 from Sensor.logger import logging
+from fastapi.middleware.cors import CORSMiddleware
 from Sensor.ml.model.estimator import TargetValueMapping
 
 def set_env_variable(env_file_path):
