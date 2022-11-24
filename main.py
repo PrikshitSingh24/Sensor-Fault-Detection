@@ -69,6 +69,7 @@ async def predict_round():
 
 def main():
     try:
+        env_file_path='E:\ml projects\Sensor fault detection\Sensor-Fault-Detection\env.yaml'
         set_env_variable(env_file_path)
         training_pipline=TrainPipline()
         training_pipline.run_pipline()
