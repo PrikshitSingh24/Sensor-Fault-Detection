@@ -4,18 +4,22 @@ from Sensor.exception import SensorException
 from Sensor.entity.artifact_entity import ModelEvaluationArtifact,ModelPusherArtifact,ModelTrainerArtifact
 from Sensor.component.data_ingestion import DataIngestion
 import sys,os
+from Sensor.cloud_storage.x3_syncer import S3Sync
 from Sensor.component.data_ingestion import DataIngestion
 from Sensor.component.data_validation import DataValidation
 from Sensor.component.data_transformation import DataTransformation
 from Sensor.component.model_evaluation import ModelEvaluation
 from Sensor.component.model_pusher import ModelPusher
 from Sensor.component.model_trainer import ModelTrainer
+from Sensor.constant.s3_bucket import TRAINING_BUCKET_NAME,PREDICTION_BUCKET_NAME
 from Sensor.logger import logging
+from Sensor.constant.Training_pipeline import SAVED_MODEL_DIR
 
 class TrainPipline:
     is_pipeline_running=False 
     def __init__(self):
         training_pipline_config=TrainingPipelineConfig()
+        self.s3_sync = S3Sync()
 
     def start_data_ingestion(self)->DataIngestionArtifact:
             try:
@@ -76,6 +80,19 @@ class TrainPipline:
                 return model_pusher_artifact
             except Exception as e:
                 raise  SensorException(e,sys)
+    def sync_artifact_dir_to_s3(self):
+        try:
+            aws_buket_url = f"s3://{TRAINING_BUCKET_NAME}/artifact/{self.training_pipeline_config.timestamp}"
+            self.s3_sync.sync_folder_to_s3(folder = self.training_pipeline_config.artifact_dir,aws_buket_url=aws_buket_url)
+        except Exception as e:
+            raise SensorException(e,sys)
+            
+    def sync_saved_model_dir_to_s3(self):
+        try:
+            aws_buket_url = f"s3://{TRAINING_BUCKET_NAME}/{SAVED_MODEL_DIR}"
+            self.s3_sync.sync_folder_to_s3(folder = SAVED_MODEL_DIR,aws_buket_url=aws_buket_url)
+        except Exception as e:
+            raise SensorException(e,sys)            
                 
     def run_pipeline(self):
         try:
@@ -89,7 +106,10 @@ class TrainPipline:
             if not model_eval_artifact.is_model_accepted:
                 raise Exception("Model is not better than the best model")
             model_pusher_artifact=self.start_model_pusher(model_eval_artifact) 
-            TrainPipline.is_pipeline_running=False    
+            TrainPipline.is_pipeline_running=False 
+            self.sync_artifact_dir_to_s3()
+            self.sync_saved_model_dir_to_s3()   
         except Exception as e:
+            self.sync_artifact_dir_to_s3()
             raise SensorException(e,sys)
 

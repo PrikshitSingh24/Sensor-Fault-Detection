@@ -19,7 +19,7 @@ class DataValidation:
         except Exception as e:
             raise SensorException(e,sys)
 
-    def validate_number_of_columns(self,dataframe:pd.DataFrame)->bool:
+    def validate_number_of_columns(self,dataframe:pd.DataFrame())->bool:
         try:
             number_of_columns=self._schema_config['columns']
             logging.info(f"Required number of columns: {number_of_columns}")
@@ -30,7 +30,7 @@ class DataValidation:
         except Exception as e:
             raise SensorException(e,sys)
 
-    def is_numerical_column_exist(self,dataframe:pd.DataFrame)->bool:
+    def is_numerical_column_exist(self,dataframe:pd.DataFrame())->bool:
         try:
             numerical_columns=self._schema_config['numerical_columns']
             dataframe_columns=dataframe.columns
